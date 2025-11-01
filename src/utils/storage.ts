@@ -1,6 +1,6 @@
 import { Recipe } from '@/types/recipe';
 
-const RECIPES_KEY = 'recipes';
+const RECIPES_KEY = 'recipes:v1';
 
 export function loadRecipes(): Recipe[] {
   try {
