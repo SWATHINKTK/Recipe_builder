@@ -79,6 +79,7 @@ const sessionSlice = createSlice({
 
       const steps = action.payload.recipe.steps;
       const current = steps[sess.stepIndex];
+      if (!current) return;
       const stepDurationMs = current.durationSeconds * 1000;
       if (sess.elapsedMsInStep >= stepDurationMs) {
         const isLast = sess.stepIndex >= steps.length - 1;

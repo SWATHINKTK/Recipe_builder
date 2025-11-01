@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { startSession, pause, resume, stop, resetSession } from '@/store/sessionSlice';
+import { useAppDispatch, useAppSelector } from '../store/index';
+import type { RootState } from '../store/index';
+import { startSession, pause, resume, stop, resetSession } from '../store/sessionSlice';
 import { Box, Typography, Stack, Button, LinearProgress, CircularProgress, Paper, Divider, Chip } from '@mui/material';
 
 function formatMs(ms: number): string {
@@ -15,8 +16,8 @@ export default function CookPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const recipe = useAppSelector((s) => s.recipes.items.find((r) => r.id === id));
-    const session = useAppSelector((s) => s.session);
+    const recipe = useAppSelector((s: RootState) => s.recipes.items.find((r) => r.id === id));
+    const session = useAppSelector((s: RootState) => s.session);
     const active = session.activeSession;
 
     const ensureStarted = () => {
@@ -25,7 +26,7 @@ export default function CookPage() {
         }
     };
 
-    const totalMs = useMemo(() => recipe?.steps.reduce((sum, s) => sum + s.durationSeconds * 1000, 0) ?? 0, [recipe?.id]);
+    const totalMs = useMemo(() => recipe?.steps.reduce((sum: number, s) => sum + s.durationSeconds * 1000, 0) ?? 0, [recipe?.id]);
     const totalProgress = active ? Math.min(100, (active.totalElapsedMs / totalMs) * 100) : 0;
     const currentStep = recipe && active ? recipe.steps[active.stepIndex] : null;
     const stepProgress = currentStep && active ? Math.min(100, (active.elapsedMsInStep / (currentStep.durationSeconds * 1000)) * 100) : 0;
@@ -194,7 +195,7 @@ export default function CookPage() {
                             gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                             gap: 1.5
                         }}>
-                            {recipe.ingredients.map((ing) => (
+                            {recipe.ingredients.map((ing: any) => (
                                 <Box
                                     key={ing.id}
                                     sx={{
@@ -221,7 +222,7 @@ export default function CookPage() {
                     <Box>
                         <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600, color: 'text.secondary' }}>Steps</Typography>
                         <Stack spacing={2}>
-                            {recipe.steps.map((step, idx) => (
+                            {recipe.steps.map((step: any, idx: number) => (
                                 <Paper
                                     key={step.id}
                                     sx={{
@@ -247,8 +248,8 @@ export default function CookPage() {
                                                 Ingredients:
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.875rem' }}>
-                                                {step.ingredientIds.map(id => {
-                                                    const ing = recipe.ingredients.find(i => i.id === id);
+                                                {step.ingredientIds.map((id: string) => {
+                                                    const ing = recipe.ingredients.find((i: any) => i.id === id);
                                                     return ing ? `${ing.name} (${ing.quantity} ${ing.unit})` : id;
                                                 }).filter(Boolean).join(', ')}
                                             </Typography>

@@ -5,8 +5,9 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/store';
-import { pause, resume, stop } from '@/store/sessionSlice';
+import { useAppDispatch, useAppSelector } from '../store/index';
+import type { RootState } from '../store/index';
+import { pause, resume, stop } from '../store/sessionSlice';
 
 function formatMs(ms: number): string {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -18,14 +19,15 @@ function formatMs(ms: number): string {
 export default function MiniPlayer() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const session = useAppSelector((s) => s.session.activeSession);
-  const status = useAppSelector((s) => s.session.status);
-  const recipe = useAppSelector((s) => s.recipes.items.find((r) => r.id === s.session.activeSession?.recipeId));
+  const session = useAppSelector((s: RootState) => s.session.activeSession);
+  const status = useAppSelector((s: RootState) => s.session.status);
+  const recipe = useAppSelector((s: RootState) => s.recipes.items.find((r) => r.id === s.session.activeSession?.recipeId));
 
   if (!session || !recipe) return null;
-  const totalRecipeMs = recipe.steps.reduce((sum, s) => sum + s.durationSeconds * 1000, 0);
+  const totalRecipeMs = recipe.steps.reduce((sum: number, s) => sum + s.durationSeconds * 1000, 0);
   const totalProgress = Math.min(100, (session.totalElapsedMs / totalRecipeMs) * 100);
   const currentStep = recipe.steps[session.stepIndex];
+  if (!currentStep) return null;
   const currentRemaining = currentStep.durationSeconds * 1000 - session.elapsedMsInStep;
 
   return (
